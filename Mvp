@@ -1,0 +1,26 @@
+import React, { useRef, useState, useEffect } from 'react'; import { Canvas, useFrame } from '@react-three/fiber'; import { OrbitControls, Html } from '@react-three/drei'; import * as THREE from 'three'; import { initializeApp } from 'firebase/app'; import { getFirestore, doc, setDoc, getDoc, onSnapshot, collection } from 'firebase/firestore';
+
+// Firebase config const firebaseConfig = { apiKey: "AIzaSyCb8dUmSbUuTqig1yv1rw1X5PfjO_xk5BI", authDomain: "cubegridapp.firebaseapp.com", projectId: "cubegridapp", storageBucket: "cubegridapp.firebasestorage.app", messagingSenderId: "417487755844", appId: "1:417487755844:web:3bd269b374b87f2c5cfa11", measurementId: "G-W6X0WBWP1H" };
+
+// Initialize Firebase const app = initializeApp(firebaseConfig); const db = getFirestore(app);
+
+const API_KEY = 'AIzaSyCFzdL-a0-O6W2Yf4DAqKM466yxYSF6Qiw';
+
+const extractVideoId = (url) => { const match = url.match(/(?:youtu.be/|v=)([\w-]{11})/); return match ? match[1] : null; };
+
+const Cube = ({ position, onClick, isSold, index, hoveredIndex, setHoveredIndex, videoId, videoInfo }) => { const meshRef = useRef(); useFrame(() => { if (meshRef.current) { meshRef.current.scale.set( hoveredIndex === index ? 1.2 : 1, hoveredIndex === index ? 1.2 : 1, hoveredIndex === index ? 1.2 : 1 ); } });
+
+return ( <group> <mesh ref={meshRef} position={position} onClick={onClick} onPointerOver={() => setHoveredIndex(index)} onPointerOut={() => setHoveredIndex(null)} > <boxGeometry args={[1, 1, 1]} /> <meshStandardMaterial color={isSold ? 'gray' : 'skyblue'} /> </mesh> {hoveredIndex === index && videoId && ( <> <sprite position={[position[0], position[1], position[2] + 1.5]}> <spriteMaterial attach="material" map={new THREE.TextureLoader().load(https://img.youtube.com/vi/${videoId}/0.jpg)} transparent={true} /> </sprite> {videoInfo && ( <Html position={[position[0], position[1], position[2] + 2.5]} center style={{ pointerEvents: 'none' }}> <div style={{ background: 'white', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' }}> <strong>{videoInfo.title}</strong><br /> <em>{videoInfo.channelTitle}</em> </div> </Html> )} </> )} </group> ); };
+
+const Grid = () => { const [soldCubes, setSoldCubes] = useState([]); const [hoveredIndex, setHoveredIndex] = useState(null); const [cubeData, setCubeData] = useState({}); const [videoInfoMap, setVideoInfoMap] = useState({});
+
+useEffect(() => { const unsubscribe = onSnapshot(collection(db, "cubes"), (snapshot) => { const newCubeData = {}; const newSold = []; snapshot.forEach(doc => { const data = doc.data(); const index = parseInt(doc.id); newCubeData[index] = data.videoId; newSold.push(index); setVideoInfoMap(prev => ({ ...prev, [index]: { title: data.title, channelTitle: data.channelTitle } })); }); setCubeData(newCubeData); setSoldCubes(newSold); }); return () => unsubscribe(); }, []);
+
+const handleCubeClick = async (index) => { if (soldCubes.includes(index)) return; const link = prompt('Enter your YouTube video link:'); const videoId = extractVideoId(link); if (videoId) { try { const res = await fetch(https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${API_KEY}); const data = await res.json(); if (data.items && data.items.length > 0) { const snippet = data.items[0].snippet; const newEntry = { videoId, title: snippet.title, channelTitle: snippet.channelTitle }; await setDoc(doc(db, "cubes", String(index)), newEntry); } } catch (error) { console.error('Failed to fetch or save video info:', error); } } else { alert('Invalid YouTube URL.'); } };
+
+const cubes = []; const size = 100; for (let x = 0; x < size; x++) { for (let y = 0; y < size; y++) { const index = x * size + y; cubes.push( <Cube key={index} index={index} position={[x * 1.2, y * 1.2, 0]} onClick={() => handleCubeClick(index)} isSold={soldCubes.includes(index)} hoveredIndex={hoveredIndex} setHoveredIndex={setHoveredIndex} videoId={cubeData[index]} videoInfo={videoInfoMap[index]} /> ); } }
+
+return <>{cubes}</>; };
+
+export default function App() { return ( <div className="w-screen h-screen"> <Canvas camera={{ position: [150, 150, 300], fov: 75 }}> <ambientLight intensity={0.5} /> <pointLight position={[100, 100, 100]} /> <OrbitControls enablePan={true} enableZoom={true} minDistance={50} maxDistance={600} minPolarAngle={0} maxPolarAngle={Math.PI / 2} /> <Grid /> </Canvas> </div> ); }
+
