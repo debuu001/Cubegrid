@@ -1,0 +1,43 @@
+<!-- Trigger Button -->
+<button onclick="document.getElementById('upiModal').style.display='block'" style="padding: 10px 20px; border-radius: 8px; background-color: #6200EE; color: white; border: none;">Buy This Cube – ₹99</button>
+
+<!-- Modal -->
+<div id="upiModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000;">
+  <div style="background:white; max-width:400px; margin:10% auto; padding:20px; border-radius:12px; position:relative;">
+    <span onclick="document.getElementById('upiModal').style.display='none'" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:20px;">&times;</span>
+
+    <h2 style="margin-bottom:10px;">Buy This Cube – ₹99</h2>
+
+    <img src="qr-cubescout.png" alt="UPI QR" style="width:200px; display:block; margin:0 auto 10px;" />
+    <p style="text-align:center; margin:5px 0;">Pay to: <b>cubescout@axl</b></p>
+    <p style="text-align:center;">Scan the QR code or use UPI ID manually.</p>
+
+    <form onsubmit="submitCubeForm(event)" style="margin-top:20px;">
+      <label>YouTube Link:</label><br>
+      <input type="url" required id="youtubeLink" placeholder="https://youtube.com/..." style="width:100%; padding:8px; margin-bottom:10px;" /><br>
+
+      <label>Name or Email (optional):</label><br>
+      <input type="text" id="userContact" placeholder="Your name or email" style="width:100%; padding:8px; margin-bottom:10px;" /><br>
+
+      <label>Transaction ID (optional):</label><br>
+      <input type="text" id="txnId" placeholder="UPI txn ID" style="width:100%; padding:8px; margin-bottom:15px;" /><br>
+
+      <button type="submit" style="width:100%; background-color:#6200EE; color:white; border:none; padding:10px; border-radius:8px;">I've Paid </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  function submitCubeForm(e) {
+    e.preventDefault();
+    const youtubeLink = document.getElementById('youtubeLink').value;
+    const contact = document.getElementById('userContact').value;
+    const txnId = document.getElementById('txnId').value;
+
+    alert("Thank you! Your link has been submitted.\nWe will verify and update shortly.");
+
+    console.log("Submission:", { youtubeLink, contact, txnId });
+
+    document.getElementById('upiModal').style.display = 'none';
+  }
+</script>
