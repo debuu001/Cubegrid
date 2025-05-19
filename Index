@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Buy This Cube</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      text-align: center;
+      background-color: #f4f4f4;
+    }
+    button {
+      padding: 12px 24px;
+      border-radius: 8px;
+      background-color: #6200EE;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #upiModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      max-width: 400px;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 12px;
+      position: relative;
+      text-align: left;
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px; right: 15px;
+      cursor: pointer;
+      font-size: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Claim Your Cube Spot</h1>
+  <p>Pay ₹99 and submit your YouTube link to feature in the grid.</p>
+  <button onclick="document.getElementById('upiModal').style.display='block'">
+    Buy This Cube – ₹99
+  </button>
+
+  <!-- Modal -->
+  <div id="upiModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="document.getElementById('upiModal').style.display='none'">&times;</span>
+      <h2>Buy This Cube – ₹99</h2>
+
+      <img src="qr-cubescout.png" alt="UPI QR Code" style="width:200px; display:block; margin: 0 auto 10px;" />
+      <p style="text-align:center;"><strong>Pay to UPI:</strong> cubescout@axl</p>
+
+      <form onsubmit="submitCubeForm(event)">
+        <label>YouTube Link:</label>
+        <input type="url" id="youtubeLink" required placeholder="https://youtube.com/..." />
+
+        <label>Your Name or Email (optional):</label>
+        <input type="text" id="userContact" placeholder="Your name or email" />
+
+        <label>Transaction ID (optional):</label>
+        <input type="text" id="txnId" placeholder="e.g. UPI txn ref ID" />
+
+        <button type="submit" style="background:#6200EE; color:white; width:100%; padding:10px; border:none; border-radius:8px;">
+          I've Paid – Submit Link
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function submitCubeForm(e) {
+      e.preventDefault();
+      const youtubeLink = document.getElementById("youtubeLink").value;
+      const contact = document.getElementById("userContact").value;
+      const txnId = document.getElementById("txnId").value;
+
+      alert("Thanks! Your link has been submitted. We'll verify and update shortly.");
+
+      console.log("Submitted:", { youtubeLink, contact, txnId });
+
+      document.getElementById("upiModal").style.display = "none";
+    }
+  </script>
+
+</body>
+</html>
